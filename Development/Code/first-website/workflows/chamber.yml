@@ -1,0 +1,35 @@
+name: Triage Bot Runner
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'   # Monday 12:00 PM GMT
+    - cron: '0 12 * * 5'   # Friday 12:00 PM GMT
+    
+    
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install -r "Chamber/slack_bot/requirements.txt"
+
+      - name: Run Triage Bot Script
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_USER: ${{ secrets.JIRA_API_USER }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          CHAMBER_WEBHOOK_URL: ${{ secrets.CHAMBER_WEBHOOK_URL }}
+        run: python "Chamber/slack_bot/chambertriage.02.py"

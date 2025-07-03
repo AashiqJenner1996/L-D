@@ -1,0 +1,45 @@
+name: Daily Demo Page E2E Test
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Runs every day at 9 AM UTC
+  workflow_dispatch:     # Also allows manual/manual run from GitHub UI
+
+jobs:
+  demo-e2e-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: Vortex/E2E_Test_Suite
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: Vortex/E2E_Test_Suite
+        run: npx playwright install --with-deps
+
+      - name: Run Demo Page E2E Test
+        working-directory: Vortex/E2E_Test_Suite
+        run: npx playwright test Demo_Page_E2E.spec.js
+        env:
+          admin_url: ${{ secrets.ADMIN_URL }}
+          demo_url: ${{ secrets.DEMO_URL }}
+          vercelbypass: ${{ secrets.VERCEL_BYPASS }}
+          password: ${{ secrets.PASSWORD }}
+          email: ${{ secrets.EMAIL }}
+
+      - name: Upload Playwright Test Artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: Vortex/E2E_Test_Suite/test-results/
+          retention-days: 7  # Optional: delete after 7 days

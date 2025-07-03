@@ -1,0 +1,19 @@
+# =============== IGNORE RULES ===============
+
+# Ignore all .env files
+.env
+
+# Ignore node_modules folders
+node_modules
+
+# Ignore test-results folders
+test-results
+
+#ignore all playwright reults folders 
+playwright-report
+
+# Ignore .DS_Store for any mac users
+.DS_Store
+
+# Ignore Macro Testing 
+Macro-Testing

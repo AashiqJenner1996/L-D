@@ -1,0 +1,32 @@
+name: Dragon Sprint Update
+
+on:
+  schedule:
+    - cron: '00 8 * * 5'  # Friday Morning 
+  workflow_dispatch:
+
+jobs:
+  run-sprint-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install -r "Dragon/slack_bot/requirements.txt"
+
+      - name: Run Dragon Sprint Update
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_USER: ${{ secrets.JIRA_API_USER }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          DRAGON_JIRA_API_TOKEN: ${{ secrets.DRAGON_JIRA_API_TOKEN }}
+          DRAGON_WEBHOOK_URL: ${{ secrets.DRAGON_WEBHOOK_URL }}
+          QA_SERVICE_WEBHOOK_URL: ${{ secrets.QA_SERVICE_WEBHOOK_URL }}
+        run: python "Dragon/slack_bot/Dragon_Sprint_Update.py"

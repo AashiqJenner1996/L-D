@@ -1,0 +1,45 @@
+name: Daily Admin Page Kll Test Event
+
+on:
+  schedule:
+    - cron: '1 17 * * *'  # Runs every day at 17:00 UTC
+  workflow_dispatch:
+
+jobs:
+  run-e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: Vortex/E2E_Test_Suite
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: Vortex/E2E_Test_Suite
+
+      - name: Run Admin_Page_Kill_Test_Event
+        run: npx playwright test Admin_Page_Kill_Test_Event.spec.js
+        working-directory: Vortex/E2E_Test_Suite
+        env:
+          admin_url: ${{ secrets.ADMIN_URL }}
+          demo_url: ${{ secrets.DEMO_URL }}
+          vercelbypass: ${{ secrets.VERCEL_BYPASS }}
+          password: ${{ secrets.PASSWORD }}
+          email: ${{ secrets.EMAIL }}
+
+      - name: Upload Playwright Test Artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: Vortex/E2E_Test_Suite/test-results/
+          retention-days: 7  # Optional: delete after 7 days
